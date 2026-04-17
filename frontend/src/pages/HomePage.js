@@ -11,7 +11,7 @@ import { Input } from '../components/ui/input';
 import { useAuth } from '../contexts/AuthContext';
 
 // ✅ IMPORTANT FIX (no env issue)
-const API = "https://your-backend.onrender.com";
+const API = "https://cakeshop-fullstack-project.onrender.com";
 
 export default function HomePage() {
   const [cakes, setCakes] = useState([]);
