@@ -36,19 +36,17 @@ export default function HomePage() {
 
   // ✅ FETCH CAKES
  const fetchCakes = async () => {
-  try {
-    const res = await axios.get(`${API}/api/cakes`);
-    console.log("CAKES RESPONSE =", res.data);
+    try {
+      const { data } = await axios.get(`${API}/cakes`);
+      setCakes(data);
+      setFilteredCakes(data);
+    } catch (error) {
+      toast.error('Failed to load cakes');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    setCakes(res.data);
-    setFilteredCakes(res.data);
-  } catch (error) {
-    console.log(error);
-    toast.error('Failed to load cakes');
-  } finally {
-    setLoading(false);
-  }
-};
 
   // ✅ FILTER LOGIC
   const filterCakes = () => {
