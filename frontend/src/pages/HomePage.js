@@ -29,7 +29,7 @@ export default function HomePage() {
 
   const fetchCakes = async () => {
     try {
-      const { data } = await axios.get(`${API}/cakes`);
+     const { data } = await axios.get(`${API}/api/cakes`);
       setCakes(data);
       setFilteredCakes(data);
     } catch (error) {
