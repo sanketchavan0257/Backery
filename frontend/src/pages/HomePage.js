@@ -33,18 +33,20 @@ export default function HomePage() {
   }, [search, category, cakes]);
 
   // ✅ FETCH CAKES
-  const fetchCakes = async () => {
-    try {
-      const { data } = await axios.get(`${API}/api/cakes`);
-      setCakes(data);
-      setFilteredCakes(data);
-    } catch (error) {
-      console.log(error);
-      toast.error('Failed to load cakes');
-    } finally {
-      setLoading(false);
-    }
-  };
+ const fetchCakes = async () => {
+  try {
+    const res = await axios.get(`${API}/api/cakes`);
+    console.log("CAKES RESPONSE =", res.data);
+
+    setCakes(res.data);
+    setFilteredCakes(res.data);
+  } catch (error) {
+    console.log(error);
+    toast.error('Failed to load cakes');
+  } finally {
+    setLoading(false);
+  }
+};
 
   // ✅ FILTER LOGIC
   const filterCakes = () => {
