@@ -189,7 +189,7 @@ export default function HomePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {filteredCakes.map((cake, index) => (
                 <motion.div
-                  key={cake.cake_id}
+                 key={cake._id}
                   initial={{ y: 50, opacity: 0 }}
                   whileInView={{ y: 0, opacity: 1 }}
                   viewport={{ once: true }}
