@@ -13,6 +13,7 @@ import { useAuth } from '../contexts/AuthContext';
 // ✅ IMPORTANT FIX (no env issue)
 //const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const API = process.env.REACT_APP_BACKEND_URL;
+console.log("API =", process.env.REACT_APP_BACKEND_URL);
 
 export default function HomePage() {
   const [cakes, setCakes] = useState([]);
