@@ -15,7 +15,7 @@ import { useAuth } from '../contexts/AuthContext';
 //const API = process.env.REACT_APP_BACKEND_URL;
 //console.log("BACKEND URL =", process.env.REACT_APP_BACKEND_URL);
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function HomePage() {
   const [cakes, setCakes] = useState([]);
@@ -37,7 +37,7 @@ export default function HomePage() {
   // ✅ FETCH CAKES
  const fetchCakes = async () => {
     try {
-      const { data } = await axios.get(`${API}/cakes`);
+      const { data } = await axios.get(`${API}/api/cakes`);
       setCakes(data);
       setFilteredCakes(data);
     } catch (error) {
