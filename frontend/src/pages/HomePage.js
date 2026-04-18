@@ -1,56 +1,35 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import axios from 'axios';
+import { Search, Heart, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
-import { Edit, Trash2, Plus, Search, TrendingUp, TrendingDown, Package, DollarSign } from 'lucide-react';
 import Navbar from '../components/Navbar';
-import EditCakeModal from '../components/EditCakeModal';
-import AddCakeModal from '../components/AddCakeModal';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '../components/ui/alert-dialog';
+import { useAuth } from '../contexts/AuthContext';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-export default function AdminCakes() {
+export default function HomePage() {
   const [cakes, setCakes] = useState([]);
   const [filteredCakes, setFilteredCakes] = useState([]);
   const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('all');
   const [loading, setLoading] = useState(true);
-  const [editingCake, setEditingCake] = useState(null);
-  const [deletingCake, setDeletingCake] = useState(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchCakes();
   }, []);
 
   useEffect(() => {
-    if (search) {
-      setFilteredCakes(
-        cakes.filter(
-          (cake) =>
-            cake.name.toLowerCase().includes(search.toLowerCase()) ||
-            cake.category.toLowerCase().includes(search.toLowerCase())
-        )
-      );
-    } else {
-      setFilteredCakes(cakes);
-    }
-  }, [search, cakes]);
+    filterCakes();
+  }, [search, category, cakes]);
 
   const fetchCakes = async () => {
     try {
-      setLoading(true);
-      const { data } = await axios.get(${API}/api/cakes);
+      const { data } = await axios.get(`${API}/cakes`);
       setCakes(data);
       setFilteredCakes(data);
     } catch (error) {
@@ -60,307 +39,226 @@ export default function AdminCakes() {
     }
   };
 
-  const handleEdit = (cake) => {
-    setEditingCake(cake);
-  };
-
-  const handleUpdate = (updatedCake) => {
-    setCakes(cakes.map((c) => (c.cake_id === updatedCake.cake_id ? updatedCake : c)));
-    setEditingCake(null);
-  };
-
-  const handleAdd = (newCake) => {
-    setCakes([newCake, ...cakes]);
-    setIsAddModalOpen(false);
-  };
-
-  const handleDelete = async () => {
-    if (!deletingCake) return;
-
-    try {
-      await axios.delete(${API}/cakes/${deletingCake.cake_id}, {
-        withCredentials: true,
-      });
-      setCakes(cakes.filter((c) => c.cake_id !== deletingCake.cake_id));
-      toast.success('Cake deleted successfully');
-      setDeletingCake(null);
-    } catch (error) {
-      toast.error('Failed to delete cake');
-    }
-  };
-
-  const toggleStock = async (cake) => {
-    try {
-      const { data } = await axios.put(
-        ${API}/cakes/${cake.cake_id},
-        { in_stock: !cake.in_stock },
-        { withCredentials: true }
+  const filterCakes = () => {
+    let filtered = [...cakes];
+    
+    if (search) {
+      filtered = filtered.filter(cake =>
+        cake.name.toLowerCase().includes(search.toLowerCase()) ||
+        cake.description.toLowerCase().includes(search.toLowerCase())
       );
-      setCakes(cakes.map((c) => (c.cake_id === cake.cake_id ? data : c)));
-      toast.success(Cake marked as ${!cake.in_stock ? 'in stock' : 'out of stock'});
+    }
+    
+    if (category !== 'all') {
+      filtered = filtered.filter(cake => cake.category === category);
+    }
+    
+    setFilteredCakes(filtered);
+  };
+
+  const addToFavorites = async (cakeId, e) => {
+    e.preventDefault();
+    if (!user) {
+      toast.error('Please login to add favorites');
+      return;
+    }
+    try {
+      await axios.post(`${API}/favorites/${cakeId}`, {}, { withCredentials: true });
+      toast.success('Added to favorites!');
     } catch (error) {
-      toast.error('Failed to update stock');
+      if (error.response?.data?.detail === 'Already in favorites') {
+        toast.info('Already in favorites');
+      } else {
+        toast.error('Failed to add to favorites');
+      }
     }
   };
 
-  const stats = {
-    totalCakes: cakes.length,
-    inStock: cakes.filter((c) => c.in_stock).length,
-    outOfStock: cakes.filter((c) => !c.in_stock).length,
-    avgPrice: cakes.length > 0 ? Math.round(cakes.reduce((sum, c) => sum + c.base_price, 0) / cakes.length) : 0,
-  };
+  const categories = ['all', 'Chocolate', 'Fruit', 'Classic', 'Cheesecake', 'Special'];
 
   return (
     <div className="min-h-screen bg-[#FAFAF7] dark:bg-[#2C1E16]">
       <Navbar />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1
-            className="text-4xl sm:text-5xl mb-2 text-[#2C1E16] dark:text-[#FAFAF7]"
+
+      {/* Hero Section */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        className="relative h-[70vh] flex items-center justify-center overflow-hidden"
+        style={{
+          backgroundImage: `linear-gradient(rgba(208, 184, 168, 0.3), rgba(243, 208, 215, 0.3)), url('https://images.unsplash.com/photo-1726981897420-0778c14deedf?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzN8MHwxfHNlYXJjaHwzfHxiYWtlcnklMjBpbnRlcmlvcnxlbnwwfHx8fDE3NzU3NDM5OTR8MA&ixlib=rb-4.1.0&q=85')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="text-center z-10 px-4">
+          <motion.h1
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+            className="text-5xl sm:text-6xl tracking-tight leading-none text-[#2C1E16] dark:text-[#FAFAF7] mb-4"
             style={{ fontFamily: "'Playfair Display', serif" }}
-            data-testid="admin-cakes-heading"
+            data-testid="hero-heading"
           >
-            Manage Cakes
-          </h1>
-          <p className="text-[#5C4A3D] dark:text-[#D0B8A8]">
-            Manage your cake inventory, pricing, and availability
-          </p>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white dark:bg-[#3C2E26] border border-[rgba(44,30,22,0.15)] rounded-lg p-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-[#5C4A3D] dark:text-[#D0B8A8] uppercase tracking-wide">
-                Total Cakes
-              </p>
-              <Package className="h-5 w-5 text-[#D0B8A8]" />
-            </div>
-            <p className="text-3xl font-bold text-[#2C1E16] dark:text-[#FAFAF7]" data-testid="total-cakes-stat">
-              {stats.totalCakes}
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-[#3C2E26] border border-[rgba(44,30,22,0.15)] rounded-lg p-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-[#5C4A3D] dark:text-[#D0B8A8] uppercase tracking-wide">
-                In Stock
-              </p>
-              <TrendingUp className="h-5 w-5 text-[#81B29A]" />
-            </div>
-            <p className="text-3xl font-bold text-[#81B29A]" data-testid="in-stock-stat">
-              {stats.inStock}
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-[#3C2E26] border border-[rgba(44,30,22,0.15)] rounded-lg p-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-[#5C4A3D] dark:text-[#D0B8A8] uppercase tracking-wide">
-                Out of Stock
-              </p>
-              <TrendingDown className="h-5 w-5 text-[#E07A5F]" />
-            </div>
-            <p className="text-3xl font-bold text-[#E07A5F]" data-testid="out-of-stock-stat">
-              {stats.outOfStock}
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-[#3C2E26] border border-[rgba(44,30,22,0.15)] rounded-lg p-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-[#5C4A3D] dark:text-[#D0B8A8] uppercase tracking-wide">
-                Avg Price
-              </p>
-              <DollarSign className="h-5 w-5 text-[#D0B8A8]" />
-            </div>
-            <p className="text-3xl font-bold text-[#2C1E16] dark:text-[#FAFAF7]" data-testid="avg-price-stat">
-              ₹{stats.avgPrice}
-            </p>
-          </div>
-        </div>
-
-        {/* Search and Actions */}
-        <div className="bg-white dark:bg-[#3C2E26] border border-[rgba(44,30,22,0.15)] rounded-lg p-4 mb-6">
-          <div className="flex flex-col sm:flex-row gap-4 items-center">
-            <div className="relative flex-1 w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5C4A3D] h-5 w-5" />
-              <Input
-                type="text"
-                placeholder="Search by name or category..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 border-[rgba(44,30,22,0.15)] focus:ring-1 focus:ring-[#2C1E16]"
-                data-testid="search-cakes-input"
-              />
-            </div>
+            Handcrafted Cakes
+            <br />
+            Made with Love
+          </motion.h1>
+          <motion.p
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+            className="text-base leading-relaxed text-[#5C4A3D] dark:text-[#D0B8A8] mb-8 max-w-2xl mx-auto"
+            style={{ fontFamily: "'Outfit', sans-serif" }}
+          >
+            Premium cakes for every celebration. Customize your perfect cake with
+            our selection of flavors, sizes, and designs.
+          </motion.p>
+          <motion.div
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+          >
             <Button
-              className="bg-[#D0B8A8] hover:bg-[#B89B88] text-white whitespace-nowrap"
-              onClick={() => setIsAddModalOpen(true)}
-              data-testid="add-cake-button"
+              onClick={() => document.getElementById('cakes-section').scrollIntoView({ behavior: 'smooth' })}
+              className="text-sm uppercase tracking-wide bg-[#D0B8A8] hover:bg-[#B89B88] text-white px-8 py-6 hover:-translate-y-1 transition-transform"
+              data-testid="explore-cakes-button"
             >
-              <Plus className="mr-2 h-4 w-4" />
-              Add New Cake
+              <ShoppingBag className="mr-2 h-5 w-5" />
+              Explore Cakes
             </Button>
-          </div>
+          </motion.div>
         </div>
+      </motion.section>
 
-        {/* Cakes Table */}
-        {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D0B8A8] mx-auto"></div>
-          </div>
-        ) : (
-          <div className="bg-white dark:bg-[#3C2E26] border border-[rgba(44,30,22,0.15)] rounded-lg overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-[#D0B8A8]/10 border-b border-[rgba(44,30,22,0.15)]">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-[#2C1E16] dark:text-[#FAFAF7] uppercase tracking-wide">
-                      Cake
-                    </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-[#2C1E16] dark:text-[#FAFAF7] uppercase tracking-wide">
-                      Category
-                    </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-[#2C1E16] dark:text-[#FAFAF7] uppercase tracking-wide">
-                      Price
-                    </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-[#2C1E16] dark:text-[#FAFAF7] uppercase tracking-wide">
-                      Stock
-                    </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-[#2C1E16] dark:text-[#FAFAF7] uppercase tracking-wide">
-                      Status
-                    </th>
-                    <th className="px-6 py-4 text-right text-sm font-semibold text-[#2C1E16] dark:text-[#FAFAF7] uppercase tracking-wide">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[rgba(44,30,22,0.15)]">
-                  {filteredCakes.map((cake) => (
-                    <tr
-                      key={cake.cake_id}
-                      className="hover:bg-[#FAFAF7] dark:hover:bg-[#2C1E16]/50 transition-colors"
-                      data-testid={cake-row-${cake.cake_id}}
-                    >
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-4">
-                          <img
-                            src={cake.image_url}
-                            alt={cake.name}
-                            className="w-16 h-16 object-cover rounded-lg border border-[rgba(44,30,22,0.15)]"
-                          />
-                          <div>
-                            <p className="font-semibold text-[#2C1E16] dark:text-[#FAFAF7]">
-                              {cake.name}
-                            </p>
-                            <p className="text-sm text-[#5C4A3D] dark:text-[#D0B8A8] truncate max-w-xs">
-                              {cake.description}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#D0B8A8]/20 text-[#2C1E16] dark:text-[#FAFAF7]">
-                          {cake.category}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <p className="font-semibold text-[#D0B8A8]">₹{cake.base_price}</p>
-                      </td>
-                      <td className="px-6 py-4">
-                        <p className="text-[#2C1E16] dark:text-[#FAFAF7]">{cake.stock}</p>
-                      </td>
-                      <td className="px-6 py-4">
-                        <button
-                          onClick={() => toggleStock(cake)}
-                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
-                            cake.in_stock
-                              ? 'bg-[#81B29A]/20 text-[#81B29A] hover:bg-[#81B29A]/30'
-                              : 'bg-[#E07A5F]/20 text-[#E07A5F] hover:bg-[#E07A5F]/30'
-                          }`}
-                          data-testid={status-badge-${cake.cake_id}}
-                        >
-                          {cake.in_stock ? 'In Stock' : 'Out of Stock'}
-                        </button>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEdit(cake)}
-                            className="hover:bg-[#D0B8A8]/20 text-[#D0B8A8]"
-                            data-testid={edit-cake-${cake.cake_id}}
-                          >
-                            <Edit className="h-4 w-4 mr-1" />
-                            Edit
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setDeletingCake(cake)}
-                            className="hover:bg-[#E07A5F]/20 text-[#E07A5F]"
-                            data-testid={delete-cake-${cake.cake_id}}
-                          >
-                            <Trash2 className="h-4 w-4 mr-1" />
-                            Delete
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {filteredCakes.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-[#5C4A3D] dark:text-[#D0B8A8]">
-                  {search ? 'No cakes found matching your search' : 'No cakes available'}
-                </p>
+      {/* Search & Filter Section */}
+      <section id="cakes-section" className="py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ y: 30, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="mb-8"
+          >
+            <div className="flex flex-col md:flex-row gap-4 items-center">
+              <div className="relative flex-1 w-full">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5C4A3D] h-5 w-5" />
+                <Input
+                  type="text"
+                  placeholder="Search cakes..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-10 border border-[rgba(44,30,22,0.15)] focus:ring-1 focus:ring-[#2C1E16] rounded-md"
+                  data-testid="search-input"
+                />
               </div>
-            )}
-          </div>
-        )}
-      </div>
+              <div className="flex gap-2 flex-wrap justify-center">
+                {categories.map((cat) => (
+                  <Button
+                    key={cat}
+                    variant={category === cat ? 'default' : 'outline'}
+                    onClick={() => setCategory(cat)}
+                    className={`text-sm uppercase tracking-wide ${
+                      category === cat
+                        ? 'bg-[#D0B8A8] hover:bg-[#B89B88] text-white'
+                        : 'border-[rgba(44,30,22,0.15)] hover:bg-[#D0B8A8]/10'
+                    }`}
+                    data-testid={`category-${cat}-button`}
+                  >
+                    {cat}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </motion.div>
 
-      {/* Edit Modal */}
-      <EditCakeModal
-        isOpen={!!editingCake}
-        onClose={() => setEditingCake(null)}
-        cake={editingCake}
-        onUpdate={handleUpdate}
-      />
+          {/* Cakes Grid */}
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[1, 2, 3, 4].map((n) => (
+                <div key={n} className="animate-pulse">
+                  <div className="bg-gray-200 dark:bg-gray-700 h-64 rounded-lg mb-4"></div>
+                  <div className="bg-gray-200 dark:bg-gray-700 h-4 rounded w-3/4 mb-2"></div>
+                  <div className="bg-gray-200 dark:bg-gray-700 h-4 rounded w-1/2"></div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {filteredCakes.map((cake, index) => (
+                <motion.div
+                  key={cake.cake_id}
+                  initial={{ y: 50, opacity: 0 }}
+                  whileInView={{ y: 0, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                >
+                  <Link to={`/cake/${cake.cake_id}`} data-testid={`cake-card-${cake.cake_id}`}>
+                    <div className="group border border-[rgba(44,30,22,0.15)] rounded-lg overflow-hidden bg-white dark:bg-[#3C2E26] hover:shadow-lg transition-shadow">
+                      <div className="overflow-hidden">
+                        <img
+                          src={cake.image_url}
+                          alt={cake.name}
+                          className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      <div className="p-6">
+                        <div className="flex justify-between items-start mb-2">
+                          <h3
+                            className="text-xl sm:text-2xl text-[#2C1E16] dark:text-[#FAFAF7]"
+                            style={{ fontFamily: "'Playfair Display', serif" }}
+                          >
+                            {cake.name}
+                          </h3>
+                          <button
+                            onClick={(e) => addToFavorites(cake.cake_id, e)}
+                            className="hover:text-[#E07A5F] transition-colors"
+                            data-testid={`add-favorite-${cake.cake_id}`}
+                          >
+                            <Heart className="h-5 w-5" />
+                          </button>
+                        </div>
+                        <p className="text-sm text-[#5C4A3D] dark:text-[#D0B8A8] mb-3">
+                          {cake.description}
+                        </p>
+                        <div className="flex justify-between items-center">
+                          <span className="text-lg font-semibold text-[#D0B8A8]">
+                            ₹{cake.base_price}
+                          </span>
+                          {!cake.in_stock && (
+                            <span className="text-xs uppercase tracking-wide text-[#E07A5F] bg-[#E07A5F]/10 px-3 py-1 rounded-full">
+                              Out of Stock
+                            </span>
+                          )}
+                          {cake.in_stock && (
+                            <span className="text-xs uppercase tracking-wide text-[#81B29A] bg-[#81B29A]/10 px-3 py-1 rounded-full">
+                              In Stock
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          )}
 
-      {/* Add Modal */}
-      <AddCakeModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onAdd={handleAdd}
-      />
-
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!deletingCake} onOpenChange={() => setDeletingCake(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete <strong>{deletingCake?.name}</strong>. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel data-testid="cancel-delete">Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-[#E07A5F] hover:bg-[#C96850]"
-              data-testid="confirm-delete"
+          {filteredCakes.length === 0 && !loading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-12"
             >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+              <p className="text-xl text-[#5C4A3D] dark:text-[#D0B8A8]">
+                No cakes found. Try a different search or filter.
+              </p>
+            </motion.div>
+          )}
+        </div>
+      </section>
     </div>
   );
 }
