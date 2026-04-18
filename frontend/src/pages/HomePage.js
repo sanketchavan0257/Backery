@@ -15,7 +15,7 @@ import { useAuth } from '../contexts/AuthContext';
 //const API = process.env.REACT_APP_BACKEND_URL;
 //console.log("BACKEND URL =", process.env.REACT_APP_BACKEND_URL);
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = "https://cakeshop-fullstack-project.onrender.com"
 
 export default function HomePage() {
   const [cakes, setCakes] = useState([]);
