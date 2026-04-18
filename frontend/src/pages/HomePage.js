@@ -10,6 +10,7 @@ import { Input } from '../components/ui/input';
 import { useAuth } from '../contexts/AuthContext';
 
 const API = process.env.REACT_APP_BACKEND_URL;
+console.log("API =", API);
 
 export default function HomePage() {
   const [cakes, setCakes] = useState([]);
