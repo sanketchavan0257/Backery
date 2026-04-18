@@ -11,7 +11,7 @@ import { Input } from '../components/ui/input';
 import { useAuth } from '../contexts/AuthContext';
 
 // ✅ FINAL FIXED API
-const API = "http://127.0.0.1:8000";
+const API = "https://cakeshop-fullstack-project.onrender.com";
 
 export default function HomePage() {
 const [cakes, setCakes] = useState([]);
