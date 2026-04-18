@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
 } from '../components/ui/alert-dialog';
 
-const API = "https://cakeshop-fullstack-project.onrender.com"
+const API = "https://cakeshop-fullstack-project.onrender.com";
 
 export default function AdminCakes() {
   const [cakes, setCakes] = useState([]);
