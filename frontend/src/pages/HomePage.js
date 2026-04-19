@@ -9,7 +9,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { useAuth } from '../contexts/AuthContext';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = "https://cakeshop-fullstack-project.onrender.com/api";
 //console.log("API:", process.env.REACT_APP_BACKEND_URL);
 
 export default function HomePage() {
