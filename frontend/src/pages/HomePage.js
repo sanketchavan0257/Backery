@@ -9,18 +9,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { useAuth } from '../contexts/AuthContext';
 
-const fetchCakes = async () => {
-    try {
-      console.log("Fetching from:", `${API}/cakes`); // ← इथे add कर
-      const { data } = await axios.get(`${API}/cakes`);
-      setCakes(data);
-      setFilteredCakes(data);
-    } catch (error) {
-      toast.error('Failed to load cakes');
-    } finally {
-      setLoading(false);
-    }
-  };
+const API = process.env.REACT_APP_BACKEND_URL;
 //console.log("API:", process.env.REACT_APP_BACKEND_URL);
 
 export default function HomePage() {
