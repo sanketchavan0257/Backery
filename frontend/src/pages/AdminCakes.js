@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
 } from '../components/ui/alert-dialog';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = "https://cakeshop-fullstack-project.onrender.com/api";
 
 export default function AdminCakes() {
   const [cakes, setCakes] = useState([]);
