@@ -44,12 +44,17 @@ export default function Navbar() {
             {user ? (
               <>
                 <Link to="/cart" data-testid="cart-link">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="hover:bg-[#D0B8A8]/20"
-                  >
-                    <ShoppingCart className="h-5 w-5" />
+                 <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                  logout();
+                  toast.success('Logout successful!');
+              }}
+                  data-testid="logout-button"
+                  className="hover:bg-[#E07A5F]/20"
+                >
+                    <LogOut className="h-5 w-5" />
                   </Button>
                 </Link>
 
