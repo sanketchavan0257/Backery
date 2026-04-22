@@ -20,6 +20,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { Button } from './ui/button';
+import { toast } from 'sonner';
 
 export default function MobileSidebar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -177,9 +178,11 @@ export default function MobileSidebar() {
                 <Button
                   variant="outline"
                   className="w-full border-[#E07A5F] text-[#E07A5F] hover:bg-[#E07A5F]/10"
-                  onClick={() => {
-                    logout();
-                    toggleSidebar();
+                 onClick={() => {
+                  logout();
+                  toggleSidebar();
+                  toast.success('Logout successful!');
+}}
                   }}
                   data-testid="logout-sidebar"
                 >
