@@ -4,8 +4,7 @@ import axios from 'axios';
 const AuthContext = createContext(null);
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
-//const API = "https://cakeshop-fullstack-project.onrender.com/api";
-//const API = process.env.REACT_APP_BACKEND_URL;
+axios.defaults.withCredentials = true;
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
