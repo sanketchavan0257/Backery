@@ -175,20 +175,19 @@ export default function MobileSidebar() {
               </div>
 
               {user ? (
-                <Button
-                  variant="outline"
-                  className="w-full border-[#E07A5F] text-[#E07A5F] hover:bg-[#E07A5F]/10"
-                 onClick={() => {
-                  logout();
-                  toggleSidebar();
-                  toast.success('Logout successful!');
-}}
-                  }}
-                  data-testid="logout-sidebar"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Logout
-                </Button>
+               <Button
+  variant="outline"
+  className="w-full border-[#E07A5F] text-[#E07A5F] hover:bg-[#E07A5F]/10"
+  onClick={() => {
+    logout();
+    toggleSidebar();
+    toast.success('Logout successful!');
+  }}
+  data-testid="logout-sidebar"
+>
+  <LogOut className="h-4 w-4 mr-2" />
+  Logout
+</Button>
               ) : (
                 <div className="flex gap-2">
                   <Link to="/login" className="flex-1" onClick={toggleSidebar}>
