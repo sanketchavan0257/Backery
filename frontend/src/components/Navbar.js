@@ -17,7 +17,6 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Mobile Sidebar + Logo */}
           <div className="flex items-center gap-4">
             <MobileSidebar />
             <Link
@@ -30,7 +29,6 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Desktop Navigation - Hidden on Mobile */}
           <div className="hidden md:flex items-center gap-4">
             <Button
               variant="ghost"
@@ -45,58 +43,33 @@ export default function Navbar() {
             {user ? (
               <>
                 <Link to="/cart" data-testid="cart-link">
-                 <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => {
-                  logout();
-                  toast.success('Logout successful!');
-              }}
-                  data-testid="logout-button"
-                  className="hover:bg-[#E07A5F]/20"
-                >
-                    <LogOut className="h-5 w-5" />
+                  <Button variant="ghost" size="icon" className="hover:bg-[#D0B8A8]/20">
+                    <ShoppingCart className="h-5 w-5" />
                   </Button>
                 </Link>
 
                 <Link to="/favorites" data-testid="favorites-link">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="hover:bg-[#D0B8A8]/20"
-                  >
+                  <Button variant="ghost" size="icon" className="hover:bg-[#D0B8A8]/20">
                     <Heart className="h-5 w-5" />
                   </Button>
                 </Link>
 
                 <Link to="/orders" data-testid="orders-link">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="hover:bg-[#D0B8A8]/20"
-                  >
+                  <Button variant="ghost" size="icon" className="hover:bg-[#D0B8A8]/20">
                     <Package className="h-5 w-5" />
                   </Button>
                 </Link>
 
                 {user.role === 'admin' && (
                   <Link to="/admin" data-testid="admin-link">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="hover:bg-[#D0B8A8]/20"
-                    >
+                    <Button variant="ghost" size="icon" className="hover:bg-[#D0B8A8]/20">
                       <LayoutDashboard className="h-5 w-5" />
                     </Button>
                   </Link>
                 )}
 
                 <Link to="/dashboard" data-testid="dashboard-link">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="hover:bg-[#D0B8A8]/20"
-                  >
+                  <Button variant="ghost" size="icon" className="hover:bg-[#D0B8A8]/20">
                     <User className="h-5 w-5" />
                   </Button>
                 </Link>
@@ -104,7 +77,10 @@ export default function Navbar() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={logout}
+                  onClick={() => {
+                    logout();
+                    toast.success('Logout successful!');
+                  }}
                   data-testid="logout-button"
                   className="hover:bg-[#E07A5F]/20"
                 >
@@ -114,17 +90,12 @@ export default function Navbar() {
             ) : (
               <>
                 <Link to="/login" data-testid="login-link">
-                  <Button
-                    variant="ghost"
-                    className="text-sm uppercase tracking-wide hover:bg-[#D0B8A8]/20"
-                  >
+                  <Button variant="ghost" className="text-sm uppercase tracking-wide hover:bg-[#D0B8A8]/20">
                     Login
                   </Button>
                 </Link>
                 <Link to="/register" data-testid="register-link">
-                  <Button
-                    className="text-sm uppercase tracking-wide bg-[#D0B8A8] hover:bg-[#B89B88] text-white"
-                  >
+                  <Button className="text-sm uppercase tracking-wide bg-[#D0B8A8] hover:bg-[#B89B88] text-white">
                     Sign Up
                   </Button>
                 </Link>
