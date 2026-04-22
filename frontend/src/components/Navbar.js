@@ -4,6 +4,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { ShoppingCart, User, Heart, Package, Moon, Sun, LogOut, LayoutDashboard } from 'lucide-react';
 import { Button } from './ui/button';
 import MobileSidebar from './MobileSidebar';
+import { toast } from 'sonner';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
