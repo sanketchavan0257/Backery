@@ -16,19 +16,25 @@ import {
   LogOut,
   Moon,
   Sun,
+  Phone,
+  Mail,
+  ChevronDown,
+  ChevronUp,
+  Headphones,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { Button } from './ui/button';
-import { toast } from 'sonner';
 
 export default function MobileSidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
   const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const location = useLocation();
 
   const toggleSidebar = () => setIsOpen(!isOpen);
+  const toggleContact = () => setIsContactOpen(!isContactOpen);
 
   const adminLinks = [
     { to: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
@@ -87,7 +93,7 @@ export default function MobileSidebar() {
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 left-0 h-screen w-80 bg-white dark:bg-[#3C2E26] shadow-2xl z-50 md:hidden overflow-y-auto flex flex-col"
+            className="fixed top-0 left-0 h-screen w-80 bg-white dark:bg-[#3C2E26] shadow-2xl z-50 md:hidden flex flex-col"
             data-testid="mobile-sidebar"
           >
             {/* Sidebar Header */}
@@ -126,7 +132,7 @@ export default function MobileSidebar() {
             )}
 
             {/* Navigation Links */}
-            <nav className="p-4 flex-1 overflow-y-auto">
+            <nav className="p-4 flex-1 overflow-y-auto min-h-0">
               <ul className="space-y-2">
                 {links.map((link) => (
                   <li key={link.to}>
@@ -145,6 +151,67 @@ export default function MobileSidebar() {
                     </Link>
                   </li>
                 ))}
+
+                {/* Contact Us Dropdown */}
+                <li>
+                  <button
+                    onClick={toggleContact}
+                    className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg transition-colors text-[#2C1E16] dark:text-[#FAFAF7] hover:bg-[#D0B8A8]/10"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Headphones className="h-5 w-5" />
+                      <span className="font-medium">Contact Us</span>
+                    </div>
+                    {isContactOpen ? (
+                      <ChevronUp className="h-4 w-4 text-[#D0B8A8]" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-[#D0B8A8]" />
+                    )}
+                  </button>
+
+                  {/* Dropdown Content */}
+                  <AnimatePresence>
+                    {isContactOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="mx-4 mt-1 mb-2 rounded-xl bg-[#F9F4F0] dark:bg-[#2C1E16] border border-[#D0B8A8]/30 overflow-hidden">
+                          {/* Phone */}
+                          <a
+                            href="tel:8482880257"
+                            className="flex items-center gap-3 px-4 py-3 hover:bg-[#D0B8A8]/10 transition-colors border-b border-[#D0B8A8]/20"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-[#D0B8A8]/20 flex items-center justify-center shrink-0">
+                              <Phone className="h-4 w-4 text-[#D0B8A8]" />
+                            </div>
+                            <div>
+                              <p className="text-xs text-[#5C4A3D] dark:text-[#D0B8A8]">Call Us</p>
+                              <p className="text-sm font-semibold text-[#2C1E16] dark:text-[#FAFAF7]">8482880257</p>
+                            </div>
+                          </a>
+
+                          {/* Email */}
+                          <a
+                            href="mailto:sanketchavan0257@gmail.com"
+                            className="flex items-center gap-3 px-4 py-3 hover:bg-[#D0B8A8]/10 transition-colors"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-[#D0B8A8]/20 flex items-center justify-center shrink-0">
+                              <Mail className="h-4 w-4 text-[#D0B8A8]" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-xs text-[#5C4A3D] dark:text-[#D0B8A8]">Email Us</p>
+                              <p className="text-sm font-semibold text-[#2C1E16] dark:text-[#FAFAF7] truncate">sanketchavan0257@gmail.com</p>
+                            </div>
+                          </a>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </li>
               </ul>
             </nav>
 
@@ -175,19 +242,18 @@ export default function MobileSidebar() {
               </div>
 
               {user ? (
-               <Button
-  variant="outline"
-  className="w-full border-[#E07A5F] text-[#E07A5F] hover:bg-[#E07A5F]/10"
-  onClick={() => {
-    logout();
-    toggleSidebar();
-    toast.success('Logout successful!');
-  }}
-  data-testid="logout-sidebar"
->
-  <LogOut className="h-4 w-4 mr-2" />
-  Logout
-</Button>
+                <Button
+                  variant="outline"
+                  className="w-full border-[#E07A5F] text-[#E07A5F] hover:bg-[#E07A5F]/10"
+                  onClick={() => {
+                    logout();
+                    toggleSidebar();
+                  }}
+                  data-testid="logout-sidebar"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
               ) : (
                 <div className="flex gap-2">
                   <Link to="/login" className="flex-1" onClick={toggleSidebar}>
