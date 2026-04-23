@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -35,6 +35,24 @@ export default function MobileSidebar() {
 
   const toggleSidebar = () => setIsOpen(!isOpen);
   const toggleContact = () => setIsContactOpen(!isContactOpen);
+
+  // Lock body scroll when sidebar is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, [isOpen]);
 
   const adminLinks = [
     { to: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
@@ -93,11 +111,11 @@ export default function MobileSidebar() {
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 left-0 h-[100dvh] w-80 bg-white dark:bg-[#3C2E26] shadow-2xl z-50 md:hidden flex flex-col"
+            className="fixed top-0 left-0 h-[100dvh] w-80 bg-white dark:bg-[#3C2E26] shadow-2xl z-50 md:hidden flex flex-col overflow-hidden"
             data-testid="mobile-sidebar"
           >
             {/* Sidebar Header */}
-            <div className="flex items-center justify-between p-6 border-b border-[rgba(44,30,22,0.15)]">
+            <div className="flex items-center justify-between p-6 border-b border-[rgba(44,30,22,0.15)] shrink-0">
               <Link
                 to="/"
                 className="text-2xl font-bold text-[#2C1E16] dark:text-[#FAFAF7]"
@@ -119,7 +137,7 @@ export default function MobileSidebar() {
 
             {/* User Info */}
             {user && (
-              <div className="p-6 border-b border-[rgba(44,30,22,0.15)]">
+              <div className="p-6 border-b border-[rgba(44,30,22,0.15)] shrink-0">
                 <p className="text-sm text-[#5C4A3D] dark:text-[#D0B8A8]">Logged in as</p>
                 <p className="font-semibold text-[#2C1E16] dark:text-[#FAFAF7]">{user.name}</p>
                 <p className="text-xs text-[#5C4A3D] dark:text-[#D0B8A8]">{user.email}</p>
@@ -131,15 +149,15 @@ export default function MobileSidebar() {
               </div>
             )}
 
-            {/* Navigation Links */}
-            <nav className="p-4 flex-1 overflow-y-auto min-h-0">
-              <ul className="space-y-2">
+            {/* Navigation Links - No Scroll */}
+            <nav className="p-4 flex-1 overflow-hidden">
+              <ul className="space-y-1">
                 {links.map((link) => (
                   <li key={link.to}>
                     <Link
                       to={link.to}
                       onClick={toggleSidebar}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                      className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors ${
                         isActive(link.to)
                           ? 'bg-[#D0B8A8] text-white'
                           : 'text-[#2C1E16] dark:text-[#FAFAF7] hover:bg-[#D0B8A8]/10'
@@ -156,7 +174,7 @@ export default function MobileSidebar() {
                 <li>
                   <button
                     onClick={toggleContact}
-                    className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg transition-colors text-[#2C1E16] dark:text-[#FAFAF7] hover:bg-[#D0B8A8]/10"
+                    className="w-full flex items-center justify-between gap-3 px-4 py-2.5 rounded-lg transition-colors text-[#2C1E16] dark:text-[#FAFAF7] hover:bg-[#D0B8A8]/10"
                   >
                     <div className="flex items-center gap-3">
                       <Headphones className="h-5 w-5" />
@@ -169,7 +187,6 @@ export default function MobileSidebar() {
                     )}
                   </button>
 
-                  {/* Dropdown Content */}
                   <AnimatePresence>
                     {isContactOpen && (
                       <motion.div
@@ -180,7 +197,6 @@ export default function MobileSidebar() {
                         className="overflow-hidden"
                       >
                         <div className="mx-4 mt-1 mb-2 rounded-xl bg-[#F9F4F0] dark:bg-[#2C1E16] border border-[#D0B8A8]/30 overflow-hidden">
-                          {/* Phone */}
                           <a
                             href="tel:8482880257"
                             className="flex items-center gap-3 px-4 py-3 hover:bg-[#D0B8A8]/10 transition-colors border-b border-[#D0B8A8]/20"
@@ -193,8 +209,6 @@ export default function MobileSidebar() {
                               <p className="text-sm font-semibold text-[#2C1E16] dark:text-[#FAFAF7]">8482880257</p>
                             </div>
                           </a>
-
-                          {/* Email */}
                           <a
                             href="mailto:sanketchavan0257@gmail.com"
                             className="flex items-center gap-3 px-4 py-3 hover:bg-[#D0B8A8]/10 transition-colors"
@@ -216,7 +230,7 @@ export default function MobileSidebar() {
             </nav>
 
             {/* Sidebar Footer */}
-            <div className="p-4 border-t border-[rgba(44,30,22,0.15)] bg-white dark:bg-[#3C2E26] mt-auto shrink-0">
+            <div className="p-4 border-t border-[rgba(44,30,22,0.15)] bg-white dark:bg-[#3C2E26] shrink-0">
               <div className="flex gap-2 mb-3">
                 <Button
                   variant="outline"
