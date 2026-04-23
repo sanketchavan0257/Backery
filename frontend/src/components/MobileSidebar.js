@@ -78,7 +78,7 @@ export default function MobileSidebar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/50 z-40 md:hidden"
+            className="fixed inset-0 h-[100dvh] bg-black/50 z-40 md:hidden touch-none"
             onClick={toggleSidebar}
             data-testid="sidebar-backdrop"
           />
@@ -93,7 +93,7 @@ export default function MobileSidebar() {
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-           className="fixed top-0 left-0 h-[100dvh] w-80 bg-white dark:bg-[#3C2E26] shadow-2xl z-50 md:hidden flex flex-col"
+            className="fixed top-0 left-0 h-[100dvh] w-80 bg-white dark:bg-[#3C2E26] shadow-2xl z-50 md:hidden flex flex-col"
             data-testid="mobile-sidebar"
           >
             {/* Sidebar Header */}
