@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Search, Heart, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
@@ -19,11 +19,18 @@ export default function HomePage() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [favorites, setFavorites] = useState([]);
+  const [animatingId, setAnimatingId] = useState(null);
   const { user } = useAuth();
 
   useEffect(() => {
     fetchCakes();
   }, []);
+
+  useEffect(() => {
+    if (user) fetchFavorites();
+    else setFavorites([]);
+  }, [user]);
 
   useEffect(() => {
     filterCakes();
@@ -39,6 +46,13 @@ export default function HomePage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchFavorites = async () => {
+    try {
+      const { data } = await axios.get(`${API}/api/favorites`, { withCredentials: true });
+      setFavorites(data.map(f => f.cake_id));
+    } catch (error) {}
   };
 
   const filterCakes = () => {
@@ -64,15 +78,20 @@ export default function HomePage() {
       toast.error('Please login to add favorites');
       return;
     }
+    setAnimatingId(cakeId);
+    setTimeout(() => setAnimatingId(null), 400);
     try {
-      await axios.post(`${API}/api/favorites/${cakeId}`, {}, { withCredentials: true });
-      toast.success('Added to favorites!');
-    } catch (error) {
-      if (error.response?.data?.detail === 'Already in favorites') {
-        toast.info('Already in favorites');
+      if (favorites.includes(cakeId)) {
+        await axios.delete(`${API}/api/favorites/${cakeId}`, { withCredentials: true });
+        setFavorites(prev => prev.filter(id => id !== cakeId));
+        toast.success('Removed from favorites!');
       } else {
-        toast.error('Failed to add to favorites');
+        await axios.post(`${API}/api/favorites/${cakeId}`, {}, { withCredentials: true });
+        setFavorites(prev => [...prev, cakeId]);
+        toast.success('Added to favorites!');
       }
+    } catch (error) {
+      toast.error('Failed to update favorites');
     }
   };
 
@@ -216,10 +235,46 @@ export default function HomePage() {
                           </h3>
                           <button
                             onClick={(e) => addToFavorites(cake.cake_id, e)}
-                            className="hover:text-[#E07A5F] transition-colors"
+                            className="relative hover:text-[#E07A5F] transition-colors focus:outline-none"
                             data-testid={`add-favorite-${cake.cake_id}`}
                           >
-                            <Heart className="h-5 w-5" />
+                            <motion.div
+                              animate={animatingId === cake.cake_id ? { scale: [1, 1.5, 0.9, 1.2, 1] } : { scale: 1 }}
+                              transition={{ duration: 0.4 }}
+                            >
+                              <Heart
+                                className="h-5 w-5 transition-all duration-300"
+                                style={{
+                                  fill: favorites.includes(cake.cake_id) ? '#E07A5F' : 'none',
+                                  color: favorites.includes(cake.cake_id) ? '#E07A5F' : 'currentColor',
+                                }}
+                              />
+                            </motion.div>
+
+                            {/* Floating hearts animation */}
+                            <AnimatePresence>
+                              {animatingId === cake.cake_id && favorites.includes(cake.cake_id) && (
+                                <>
+                                  {[...Array(4)].map((_, i) => (
+                                    <motion.div
+                                      key={i}
+                                      initial={{ opacity: 1, scale: 0.5, x: 0, y: 0 }}
+                                      animate={{
+                                        opacity: 0,
+                                        scale: 1.2,
+                                        x: (i % 2 === 0 ? -1 : 1) * (10 + i * 5),
+                                        y: -(20 + i * 8),
+                                      }}
+                                      exit={{ opacity: 0 }}
+                                      transition={{ duration: 0.5, delay: i * 0.05 }}
+                                      className="absolute top-0 left-0 pointer-events-none"
+                                    >
+                                      <Heart className="h-3 w-3" style={{ fill: '#E07A5F', color: '#E07A5F' }} />
+                                    </motion.div>
+                                  ))}
+                                </>
+                              )}
+                            </AnimatePresence>
                           </button>
                         </div>
                         <p className="text-sm text-[#5C4A3D] dark:text-[#D0B8A8] mb-3">
