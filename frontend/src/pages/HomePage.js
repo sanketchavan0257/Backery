@@ -65,7 +65,7 @@ export default function HomePage() {
       return;
     }
     try {
-      await axios.post(`${API}/favorites/${cakeId}`, {}, { withCredentials: true });
+      await axios.post(`${API}/api/favorites/${cakeId}`, {}, { withCredentials: true });
       toast.success('Added to favorites!');
     } catch (error) {
       if (error.response?.data?.detail === 'Already in favorites') {
