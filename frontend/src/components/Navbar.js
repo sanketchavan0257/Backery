@@ -25,7 +25,7 @@ export default function Navbar() {
               className="text-2xl font-bold text-[#2C1E16] dark:text-[#FAFAF7]"
               style={{ fontFamily: "'Playfair Display', serif" }}
             >
-              CakeCraft
+              GswitHome
             </Link>
           </div>
 
