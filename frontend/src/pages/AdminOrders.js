@@ -397,8 +397,12 @@ export default function AdminOrders() {
                                 </div>
                                 <div className="flex justify-between items-center text-sm">
                                   <span className="text-[#5C4A3D] dark:text-[#D0B8A8]">Payment Status</span>
-                                  <span className="font-semibold text-[#2C1E16] dark:text-[#FAFAF7]">
-                                    {order.payment_status || 'Pending'}
+                                  <span className={`font-semibold px-3 py-1 rounded-md text-xs uppercase tracking-wide ${
+                                    status === 'completed'
+                                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                                      : 'text-[#2C1E16] dark:text-[#FAFAF7]'
+                                  }`}>
+                                    {status === 'completed' ? 'Paid' : (order.payment_status || 'Pending')}
                                   </span>
                                 </div>
                                 <div className="flex justify-between items-center pt-2 border-t border-[rgba(44,30,22,0.1)]">
