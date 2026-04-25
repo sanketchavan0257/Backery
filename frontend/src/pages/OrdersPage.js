@@ -38,7 +38,7 @@ export default function OrdersPage() {
                     <p className="text-sm text-[#5C4A3D] dark:text-[#D0B8A8]">Order ID: {order.order_id.slice(0, 8)}</p>
                     <p className="text-sm text-[#5C4A3D] dark:text-[#D0B8A8]">Ordered: {new Date(order.created_at).toLocaleDateString()}</p>
                   </div>
-                  <span className={`px-4 py-1 rounded-full text-sm uppercase ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : order.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`} data-testid={`order-status-${order.order_id}`}>{order.status}</span>
+                  <span className={`px-4 py-1 rounded-full text-sm uppercase ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : order.status === 'completed' ? 'bg-green-100 text-green-800' : order.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'}`} data-testid={`order-status-${order.order_id}`}>{order.status}</span>
                 </div>
                 <div className="space-y-3 mb-4">
                   {order.items?.map((item, idx) => (
