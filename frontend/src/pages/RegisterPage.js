@@ -46,7 +46,7 @@ export default function RegisterPage() {
             className="text-3xl font-bold text-[#2C1E16] dark:text-[#FAFAF7] block text-center mb-2"
             style={{ fontFamily: "'Playfair Display', serif" }}
           >
-            CakeCraft
+            GswitHome
           </Link>
           <p className="text-center text-[#5C4A3D] dark:text-[#D0B8A8] mb-8">
             Create your account to start ordering
