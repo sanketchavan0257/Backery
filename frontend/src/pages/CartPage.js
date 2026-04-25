@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { Trash2, CreditCard, Zap } from 'lucide-react';
+import { Trash2, CreditCard, Zap, ChevronDown } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -11,6 +11,54 @@ import { Label } from '../components/ui/label';
 import { useAuth } from '../contexts/AuthContext';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+const CITY_VILLAGE_MAP = {
+  'Kankavli': ['Tarale', 'Nandgao'],
+  'Vaibhavwadi': ['Lore No. 2', 'Aachirne', 'Napane', 'Khambale'],
+};
+
+const CITIES = Object.keys(CITY_VILLAGE_MAP);
+
+function CustomDropdown({ label, options, value, onChange, placeholder, testId }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="relative">
+      <Label className="text-[#2C1E16] dark:text-[#FAFAF7]">{label} *</Label>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full mt-1 flex items-center justify-between px-3 py-2 border border-[rgba(44,30,22,0.15)] rounded-md bg-white dark:bg-[#3C2E26] text-sm text-left focus:outline-none focus:ring-1 focus:ring-[#D0B8A8]"
+        data-testid={testId}
+      >
+        <span className={value ? 'text-[#2C1E16] dark:text-[#FAFAF7]' : 'text-gray-400'}>
+          {value || placeholder}
+        </span>
+        <ChevronDown className={`h-4 w-4 text-[#D0B8A8] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <motion.ul
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="absolute z-50 w-full mt-1 bg-white dark:bg-[#3C2E26] border border-[rgba(44,30,22,0.15)] rounded-md shadow-lg overflow-hidden"
+        >
+          {options.map((option) => (
+            <li
+              key={option}
+              onClick={() => { onChange(option); setIsOpen(false); }}
+              className={`px-4 py-2.5 text-sm cursor-pointer transition-colors hover:bg-[#D0B8A8]/10 ${
+                value === option ? 'bg-[#D0B8A8]/20 text-[#D0B8A8] font-medium' : 'text-[#2C1E16] dark:text-[#FAFAF7]'
+              }`}
+            >
+              {option}
+            </li>
+          ))}
+        </motion.ul>
+      )}
+    </div>
+  );
+}
 
 export default function CartPage() {
   const location = useLocation();
@@ -30,7 +78,8 @@ export default function CartPage() {
     user_mobile: '',
     street: '',
     city: '',
-    state: '',
+    village: '',
+    state: 'Maharashtra',
     pincode: '',
   });
 
@@ -73,6 +122,14 @@ export default function CartPage() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleCityChange = (city) => {
+    setFormData(prev => ({ ...prev, city, village: '' }));
+  };
+
+  const handleVillageChange = (village) => {
+    setFormData(prev => ({ ...prev, village }));
+  };
+
   const displayItems = isDirectOrder ? [directOrder] : cartItems;
   const total = isDirectOrder
     ? directOrder.price
@@ -83,7 +140,7 @@ export default function CartPage() {
       toast.error('Please fill in your name, email, and mobile number');
       return;
     }
-    if (!formData.street || !formData.city || !formData.state || !formData.pincode) {
+    if (!formData.street || !formData.city || !formData.village || !formData.pincode) {
       toast.error('Please fill in complete delivery address');
       return;
     }
@@ -108,7 +165,7 @@ export default function CartPage() {
           user_mobile: formData.user_mobile,
           street: formData.street,
           city: formData.city,
-          state: formData.state,
+          state: `${formData.village}, Maharashtra`,
           pincode: formData.pincode,
           is_direct_order: isDirectOrder,
         },
@@ -211,16 +268,29 @@ export default function CartPage() {
                         <Label htmlFor="street" className="text-[#2C1E16] dark:text-[#FAFAF7]">Street Address *</Label>
                         <Input id="street" name="street" value={formData.street} onChange={handleInputChange} placeholder="House no., street name" className="border-[rgba(44,30,22,0.15)]" data-testid="street-input" required />
                       </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <Label htmlFor="city" className="text-[#2C1E16] dark:text-[#FAFAF7]">City *</Label>
-                          <Input id="city" name="city" value={formData.city} onChange={handleInputChange} placeholder="City" className="border-[rgba(44,30,22,0.15)]" data-testid="city-input" required />
-                        </div>
-                        <div>
-                          <Label htmlFor="state" className="text-[#2C1E16] dark:text-[#FAFAF7]">State *</Label>
-                          <Input id="state" name="state" value={formData.state} onChange={handleInputChange} placeholder="State" className="border-[rgba(44,30,22,0.15)]" data-testid="state-input" required />
-                        </div>
-                      </div>
+
+                      {/* City Dropdown */}
+                      <CustomDropdown
+                        label="City"
+                        options={CITIES}
+                        value={formData.city}
+                        onChange={handleCityChange}
+                        placeholder="Select city"
+                        testId="city-input"
+                      />
+
+                      {/* Village Dropdown - only show after city selected */}
+                      {formData.city && (
+                        <CustomDropdown
+                          label="Village / Gaon"
+                          options={CITY_VILLAGE_MAP[formData.city]}
+                          value={formData.village}
+                          onChange={handleVillageChange}
+                          placeholder="Select village"
+                          testId="village-input"
+                        />
+                      )}
+
                       <div>
                         <Label htmlFor="pincode" className="text-[#2C1E16] dark:text-[#FAFAF7]">Pincode * (6 digits)</Label>
                         <Input id="pincode" name="pincode" type="text" value={formData.pincode} onChange={handleInputChange} placeholder="6-digit pincode" maxLength={6} className="border-[rgba(44,30,22,0.15)]" data-testid="pincode-input" required />
