@@ -122,7 +122,7 @@ export default function MobileSidebar() {
                 style={{ fontFamily: "'Playfair Display', serif" }}
                 onClick={toggleSidebar}
               >
-                CakeCraft
+                GswitHome
               </Link>
               <Button
                 variant="ghost"
