@@ -13,8 +13,8 @@ import { useAuth } from '../contexts/AuthContext';
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const CITY_VILLAGE_MAP = {
-  'Kankavli': ['Tarale', 'Nandgao'],
-  'Vaibhavwadi': ['Lore No. 2', 'Aachirne', 'Napane', 'Khambale'],
+  'Kankavli': ['Tarale', 'Nandgao', 'Phondaghat'],
+  'Vaibhavwadi': ['Lore No. 2', 'Aachirne', 'Napane', 'Khambale', 'Vaibhavwadi'],
 };
 
 const CITIES = Object.keys(CITY_VILLAGE_MAP);
