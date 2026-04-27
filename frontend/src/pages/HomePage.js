@@ -108,7 +108,7 @@ export default function HomePage() {
         transition={{ duration: 0.8 }}
         className="relative h-[70vh] flex items-center justify-center overflow-hidden"
         style={{
-          backgroundImage: `linear-gradient(rgba(208, 184, 168, 0.3), rgba(243, 208, 215, 0.3)), url('https://images.unsplash.com/photo-1726981897420-0778c14deedf?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzN8MHwxfHNlYXJjaHwzfHxiYWtlcnklMjBpbnRlcmlvcnxlbnwwfHx8fDE3NzU3NDM5OTR8MA&ixlib=rb-4.1.0&q=85')`,
+          backgroundImage: `linear-gradient(rgba(208, 184, 168, 0.3), rgba(243, 208, 215, 0.3)), url('')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
