@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X, Upload, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
@@ -15,6 +15,7 @@ import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Switch } from './ui/switch';
+import { convertImageLink, isPinterestPageLink, compressImageFile } from '../lib/imageHelpers';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -56,10 +57,32 @@ export default function EditCakeModal({ isOpen, onClose, cake, onUpdate }) {
     }));
   };
 
+  const fileInputRef = useRef(null);
+
   const handleImageUrlChange = (e) => {
-    const url = e.target.value;
+    const raw = e.target.value;
+    if (isPinterestPageLink(raw)) {
+      toast.error(
+        'Pinterest page link chalat nahi. Image var long-press / right click karun "Copy image address" kara, kinva photo upload kara.',
+        { id: 'pinterest-link' }
+      );
+    }
+    const url = convertImageLink(raw); // Google Drive links are converted automatically
     setFormData((prev) => ({ ...prev, image_url: url }));
     setImagePreview(url);
+  };
+
+  const handleFileSelect = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    try {
+      const dataUrl = await compressImageFile(file);
+      setFormData((prev) => ({ ...prev, image_url: dataUrl }));
+      setImagePreview(dataUrl);
+    } catch (err) {
+      toast.error('Image load zali nahi. Dusri image (JPG/PNG) try kara.');
+    }
+    e.target.value = '';
   };
 
   const handleSubmit = async (e) => {
@@ -141,9 +164,13 @@ export default function EditCakeModal({ isOpen, onClose, cake, onUpdate }) {
                 id="image_url"
                 name="image_url"
                 type="url"
-                value={formData.image_url}
+                value={formData.image_url.startsWith('data:') ? '' : formData.image_url}
                 onChange={handleImageUrlChange}
-                placeholder="https://example.com/cake-image.jpg"
+                placeholder={
+                  formData.image_url.startsWith('data:')
+                    ? 'Photo uploaded. Paste a link here to replace it'
+                    : 'https://example.com/cake-image.jpg'
+                }
                 className="border-[rgba(44,30,22,0.15)] focus:ring-1 focus:ring-[#2C1E16]"
                 data-testid="image-url-input"
               />
@@ -151,14 +178,24 @@ export default function EditCakeModal({ isOpen, onClose, cake, onUpdate }) {
                 type="button"
                 variant="outline"
                 size="icon"
-                onClick={() => setImagePreview(formData.image_url)}
+                onClick={() => fileInputRef.current && fileInputRef.current.click()}
                 className="shrink-0"
+                title="Upload photo from phone / computer"
+                data-testid="upload-image-button"
               >
                 <Upload className="h-4 w-4" />
               </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+                data-testid="image-file-input"
+              />
             </div>
             <p className="text-xs text-[#5C4A3D] dark:text-[#D0B8A8] mt-1">
-              Enter image URL or upload your own
+              Paste an image link, or click the upload icon to pick a photo from your phone / computer
             </p>
           </div>
 
