@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
 } from '../components/ui/alert-dialog';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function AdminCakes() {
   const [cakes, setCakes] = useState([]);
@@ -50,7 +50,7 @@ export default function AdminCakes() {
   const fetchCakes = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get(`${API}/api/cakes`);
+      const { data } = await axios.get(`${API}/cakes`);
       setCakes(data);
       setFilteredCakes(data);
     } catch (error) {
