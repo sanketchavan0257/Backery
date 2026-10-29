@@ -23,6 +23,7 @@ export default function EditCakeModal({ isOpen, onClose, cake, onUpdate }) {
     name: '',
     description: '',
     base_price: '',
+    ice_cake_price: '',
     category: '',
     image_url: '',
     stock: '',
@@ -37,6 +38,7 @@ export default function EditCakeModal({ isOpen, onClose, cake, onUpdate }) {
         name: cake.name || '',
         description: cake.description || '',
         base_price: cake.base_price || '',
+        ice_cake_price: cake.ice_cake_price || '',
         category: cake.category || '',
         image_url: cake.image_url || '',
         stock: cake.stock || 0,
@@ -80,6 +82,7 @@ export default function EditCakeModal({ isOpen, onClose, cake, onUpdate }) {
         name: formData.name,
         description: formData.description,
         base_price: priceNum,
+        ice_cake_price: parseFloat(formData.ice_cake_price) || 0,
         category: formData.category,
         image_url: formData.image_url,
         stock: parseInt(formData.stock) || 0,
@@ -188,6 +191,25 @@ export default function EditCakeModal({ isOpen, onClose, cake, onUpdate }) {
               rows={3}
               className="border-[rgba(44,30,22,0.15)] focus:ring-1 focus:ring-[#2C1E16] resize-none"
               data-testid="description-input"
+            />
+          </div>
+
+          {/* Ice Cake Price */}
+          <div>
+            <Label htmlFor="ice_cake_price" className="text-[#2C1E16] dark:text-[#FAFAF7]">
+              Ice Cake Price (₹)
+            </Label>
+            <Input
+              id="ice_cake_price"
+              name="ice_cake_price"
+              type="number"
+              min="0"
+              step="0.01"
+              value={formData.ice_cake_price}
+              onChange={handleInputChange}
+              placeholder="Leave empty if Ice Cake is not available"
+              className="border-[rgba(44,30,22,0.15)] focus:ring-1 focus:ring-[#2C1E16]"
+              data-testid="ice-price-input"
             />
           </div>
 
