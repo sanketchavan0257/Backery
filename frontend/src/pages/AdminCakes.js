@@ -255,7 +255,9 @@ export default function AdminCakes() {
                               {cake.name}
                             </p>
                             <p className="text-sm text-[#5C4A3D] dark:text-[#D0B8A8] truncate max-w-xs">
-                              {cake.description}
+                              {cake.description?.split(' ').length > 5
+                                ? cake.description.split(' ').slice(0, 5).join(' ') + '...'
+                                : cake.description}
                             </p>
                           </div>
                         </div>
