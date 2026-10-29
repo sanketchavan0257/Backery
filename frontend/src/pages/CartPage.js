@@ -226,6 +226,7 @@ export default function CartPage() {
                     <h3 className="text-lg font-semibold text-[#2C1E16] dark:text-[#FAFAF7]">{item.cake_name}</h3>
                     <p className="text-sm text-[#5C4A3D] dark:text-[#D0B8A8]">Weight: {item.weight}</p>
                     <p className="text-sm text-[#5C4A3D] dark:text-[#D0B8A8]">Flavor: {item.flavor}</p>
+                    <p className="text-sm text-[#5C4A3D] dark:text-[#D0B8A8]">Type: {item.cake_type === 'ice' ? 'Ice Cake' : 'Normal Cake'}</p>
                     {item.message && <p className="text-sm text-[#5C4A3D] dark:text-[#D0B8A8]">Message: "{item.message}"</p>}
                     <p className="text-sm text-[#5C4A3D] dark:text-[#D0B8A8]">Delivery: {item.delivery_date}</p>
                     {item.quantity > 1 && <p className="text-sm text-[#5C4A3D] dark:text-[#D0B8A8]">Qty: {item.quantity}</p>}
