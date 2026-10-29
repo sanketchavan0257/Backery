@@ -21,6 +21,7 @@ export default function ProductDetailPage() {
   const [cake, setCake] = useState(null);
   const [weight, setWeight] = useState('1kg');
   const [flavor, setFlavor] = useState('');
+  const [cakeType, setCakeType] = useState('normal');
   const [message, setMessage] = useState('');
   const [deliveryDate, setDeliveryDate] = useState('');
   const [quantity, setQuantity] = useState(1);
@@ -51,7 +52,11 @@ export default function ProductDetailPage() {
     '2kg': 4.0,
   };
 
-  const unitPrice = cake ? Math.round(cake.base_price * weightMultiplier[weight]) : 0;
+  const hasIceCake = !!cake && Number(cake.ice_cake_price) > 0;
+  const basePrice = cake
+    ? (cakeType === 'ice' && hasIceCake ? Number(cake.ice_cake_price) : cake.base_price)
+    : 0;
+  const unitPrice = cake ? Math.round(basePrice * weightMultiplier[weight]) : 0;
   const totalPrice = unitPrice * quantity;
 
   const validateSelections = () => {
@@ -77,6 +82,7 @@ export default function ProductDetailPage() {
           cake_id: cakeId,
           weight,
           flavor,
+          cake_type: cakeType,
           message,
           delivery_date: deliveryDate,
           quantity,
@@ -105,6 +111,7 @@ export default function ProductDetailPage() {
           cake_image: cake.image_url,
           weight,
           flavor,
+          cake_type: cakeType,
           message,
           delivery_date: deliveryDate,
           quantity,
@@ -213,6 +220,30 @@ export default function ProductDetailPage() {
                   </div>
                 </RadioGroup>
               </div>
+
+              {hasIceCake && (
+                <div>
+                  <Label className="text-lg mb-3 block text-[#2C1E16] dark:text-[#FAFAF7]">
+                    Cake Type
+                  </Label>
+                  <RadioGroup value={cakeType} onValueChange={setCakeType} data-testid="cake-type-selector">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex items-center">
+                        <RadioGroupItem value="normal" id="type-normal" data-testid="cake-type-normal" />
+                        <Label htmlFor="type-normal" className="ml-2 cursor-pointer">
+                          Normal Cake
+                        </Label>
+                      </div>
+                      <div className="flex items-center">
+                        <RadioGroupItem value="ice" id="type-ice" data-testid="cake-type-ice" />
+                        <Label htmlFor="type-ice" className="ml-2 cursor-pointer">
+                          Ice Cake
+                        </Label>
+                      </div>
+                    </div>
+                  </RadioGroup>
+                </div>
+              )}
 
               <div>
                 <Label htmlFor="flavor" className="text-lg mb-3 block text-[#2C1E16] dark:text-[#FAFAF7]">
