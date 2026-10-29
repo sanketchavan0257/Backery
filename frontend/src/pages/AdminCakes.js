@@ -248,7 +248,7 @@ export default function AdminCakes() {
                           <img
                             src={cake.image_url}
                             alt={cake.name}
-                            className="w-16 h-16 object-cover rounded-lg border border-[rgba(44,30,22,0.15)]"
+                            className="w-16 h-16 min-w-[4rem] min-h-[4rem] flex-shrink-0 object-cover rounded-lg border border-[rgba(44,30,22,0.15)]"
                           />
                           <div>
                             <p className="font-semibold text-[#2C1E16] dark:text-[#FAFAF7]">
