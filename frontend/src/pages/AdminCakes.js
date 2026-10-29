@@ -269,6 +269,9 @@ export default function AdminCakes() {
                       </td>
                       <td className="px-6 py-4">
                         <p className="font-semibold text-[#D0B8A8]">₹{cake.base_price}</p>
+                        {cake.ice_cake_price > 0 && (
+                          <p className="text-xs text-[#5C4A3D] dark:text-[#D0B8A8]">Ice Cake: ₹{cake.ice_cake_price}</p>
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         <p className="text-[#2C1E16] dark:text-[#FAFAF7]">{cake.stock}</p>
