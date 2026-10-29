@@ -371,6 +371,7 @@ export default function AdminOrders() {
                                       <div className="text-xs text-[#5C4A3D] dark:text-[#D0B8A8] mt-1 space-y-0.5">
                                         {item.weight && <span>Weight: {item.weight}</span>}
                                         {item.flavor && <span className="ml-2">Flavor: {item.flavor}</span>}
+                                        <span className="ml-2 font-semibold">Type: {item.cake_type === 'ice' ? 'Ice Cake' : 'Normal Cake'}</span>
                                         {item.message && <p>Message: "{item.message}"</p>}
                                         {item.delivery_date && (
                                           <p className="flex items-center gap-1">
