@@ -44,7 +44,7 @@ export default function OrdersPage() {
                   {order.items?.map((item, idx) => (
                     <div key={idx} className="bg-[#F9F4F0] dark:bg-[#2C1E16] rounded-lg px-4 py-3">
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="font-medium text-[#2C1E16] dark:text-[#FAFAF7]">{item.cake_name} ({item.weight})</span>
+                        <span className="font-medium text-[#2C1E16] dark:text-[#FAFAF7]">{item.cake_name} ({item.weight}{item.cake_type === 'ice' ? ', Ice Cake' : ''})</span>
                         <span className="text-[#D0B8A8] font-semibold">₹{item.price}</span>
                       </div>
                       {item.delivery_date && (
