@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,19 +10,72 @@ import { Button } from '../components/ui/button';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
+// How often to check for new orders (milliseconds)
+const POLL_INTERVAL_MS = 30000;
+
+// Short "ding-ding-ding" sound (no audio file needed)
+const playNewOrderSound = () => {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    [0, 0.25, 0.5].forEach((t) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.value = 880;
+      gain.gain.value = 0.2;
+      osc.start(ctx.currentTime + t);
+      osc.stop(ctx.currentTime + t + 0.15);
+    });
+    setTimeout(() => ctx.close(), 1500);
+  } catch (e) {
+    // Browser blocked sound - ignore
+  }
+};
+
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openOrderId, setOpenOrderId] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null); // order_id or 'all'
+  const knownOrderIds = useRef(null); // order ids we have already seen
 
   useEffect(() => { fetchOrders(); }, []);
+
+  // Check for new orders every 30 seconds while this page is open
+  useEffect(() => {
+    const timer = setInterval(async () => {
+      if (!knownOrderIds.current) return; // first load not finished yet
+      try {
+        const { data } = await axios.get(`${API}/admin/orders`, { withCredentials: true });
+        const newOrders = data.filter((o) => !knownOrderIds.current.has(o.order_id));
+        if (newOrders.length > 0) {
+          newOrders.forEach((o) => knownOrderIds.current.add(o.order_id));
+          setOrders(data);
+          playNewOrderSound();
+          toast.success(
+            newOrders.length === 1
+              ? `New order received from ${newOrders[0].user_name || 'a customer'}!`
+              : `${newOrders.length} new orders received!`,
+            { duration: 10000 }
+          );
+        }
+      } catch (error) {
+        // Ignore - will retry on next check
+      }
+    }, POLL_INTERVAL_MS);
+    return () => clearInterval(timer);
+  }, []);
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
       const { data } = await axios.get(`${API}/admin/orders`, { withCredentials: true });
       setOrders(data);
+      knownOrderIds.current = new Set(data.map((o) => o.order_id));
     } catch (error) {
       toast.error('Failed to load orders');
     } finally {
